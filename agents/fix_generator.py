@@ -19,7 +19,14 @@ def generate_fix(code: str, vuln: dict) -> dict:
         line_number = vuln.get("line_number", "Unknown")
         vulnerable_snippet = vuln.get("vulnerable_snippet", "")
         
-        system_instruction = "You are a security engineer. Return ONLY valid JSON. No markdown."
+        system_instruction = (
+            "You are a security engineer. Return the fix in exactly \n"
+            "this format with these exact markers:\n"
+            "BEFORE: <the vulnerable code line>\n"
+            "AFTER: <the fixed code line>\n"
+            "EXPLANATION: <one sentence why this fix works>\n"
+            "No JSON. No markdown. Just these three lines."
+        )
         
         # Instantiate the Groq client
         client = Groq(api_key=GROQ_API_KEY)
@@ -27,11 +34,7 @@ def generate_fix(code: str, vuln: dict) -> dict:
         user_message = (
             f"Original code:\n{code}\n\n"
             f"Vulnerability: {vuln_type} at line {line_number}\n"
-            f"Vulnerable code: {vulnerable_snippet}\n\n"
-            "Return JSON with exactly these keys:\n"
-            "before: the vulnerable line as-is\n"
-            "after: the fixed replacement code\n"
-            "explanation: why this fix works in one sentence"
+            f"Vulnerable code: {vulnerable_snippet}\n"
         )
         
         response = client.chat.completions.create(
@@ -42,30 +45,37 @@ def generate_fix(code: str, vuln: dict) -> dict:
             ]
         )
         
-        content = response.choices[0].message.content.strip()
+        content = response.choices[0].message.content
         
-        # Clean up markdown code block wrapping if present
-        if content.startswith("```json"):
-            content = content[7:]
-        elif content.startswith("```"):
-            content = content[3:]
-        if content.endswith("```"):
-            content = content[:-3]
-        content = content.strip()
+        before = "N/A"
+        after = "N/A"
+        explanation = "N/A"
         
-        if not content:
-            return {"error": "Empty response from Groq API"}
+        if "BEFORE:" in content:
+            idx_before = content.find("BEFORE:") + len("BEFORE:")
+            idx_after = content.find("AFTER:")
+            if idx_after != -1 and idx_after > idx_before:
+                before = content[idx_before:idx_after].strip()
+            else:
+                before = content[idx_before:].strip()
+                
+        if "AFTER:" in content:
+            idx_after = content.find("AFTER:") + len("AFTER:")
+            idx_explain = content.find("EXPLANATION:")
+            if idx_explain != -1 and idx_explain > idx_after:
+                after = content[idx_after:idx_explain].strip()
+            else:
+                after = content[idx_after:].strip()
+                
+        if "EXPLANATION:" in content:
+            idx_explain = content.find("EXPLANATION:") + len("EXPLANATION:")
+            explanation = content[idx_explain:].strip()
             
-        data = json.loads(content)
-        if isinstance(data, dict):
-            # Ensure the required keys are present
-            required_keys = ["before", "after", "explanation"]
-            for key in required_keys:
-                if key not in data:
-                    data[key] = "N/A"
-            return data
-            
-        return {"error": "Invalid response format returned from model"}
+        return {
+            "before": before,
+            "after": after,
+            "explanation": explanation
+        }
         
     except Exception as e:
         return {"error": f"An error occurred during fix generation: {str(e)}"}
