@@ -4,6 +4,8 @@ from config import GROQ_API_KEY
 
 SYSTEM_INSTRUCTION = (
     "You are an aggressive security vulnerability scanner.\n"
+    "The code may be Python, JavaScript, PHP, Java, or TypeScript.\n"
+    "Identify the language first then apply language-specific security rules.\n"
     "You MUST find security issues in code. Look for ANY of these:\n"
     "SQL injection, hardcoded passwords or API keys, command injection,\n"
     "path traversal, missing input validation, insecure functions,\n"
