@@ -18,8 +18,6 @@ SYSTEM_INSTRUCTION = (
     "If no vulnerabilities found return empty array []"
 )
 
-# Instantiate the Groq client
-client = Groq(api_key=GROQ_API_KEY)
 
 def validate_input(code: str) -> str:
     if not code or len(code.strip()) < 10:
@@ -65,6 +63,10 @@ def scan_code(code: str) -> tuple:
         tuple: (detected_language, vulnerabilities_list)
     """
     detected_lang = detect_language(code)
+    
+    # Instantiate the Groq client
+    client = Groq(api_key=GROQ_API_KEY)
+    
     for attempt in range(3):
         try:
             response = client.chat.completions.create(

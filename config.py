@@ -17,4 +17,5 @@ except Exception:
     pass
 
 if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY is not set")
+    print("Warning: GROQ_API_KEY is not set in environment or secrets.")
+
