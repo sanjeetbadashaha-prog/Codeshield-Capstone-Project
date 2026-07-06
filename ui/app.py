@@ -221,53 +221,73 @@ st.markdown("""
     }
     
     /* Styled container card rules */
-    div[data-testid="stVerticalBlock"]:has(div.vuln-card-marker) {
-        background-color: #1a1625 !important;
-        border-top: 1px solid #2d2640 !important;
-        border-right: 1px solid #2d2640 !important;
-        border-bottom: 1px solid #2d2640 !important;
-        border-radius: 8px !important;
-        padding: 16px !important;
-        margin-bottom: 12px !important;
-        gap: 12px !important;
-    }
-    div[data-testid="stVerticalBlock"]:has(div.vuln-card-marker-critical) {
-        border-left: 3px solid #ff4444 !important;
-    }
-    div[data-testid="stVerticalBlock"]:has(div.vuln-card-marker-high) {
-        border-left: 3px solid #ff8c00 !important;
-    }
-    div[data-testid="stVerticalBlock"]:has(div.vuln-card-marker-medium) {
-        border-left: 3px solid #ffd700 !important;
-    }
-    div[data-testid="stVerticalBlock"]:has(div.vuln-card-marker-low) {
-        border-left: 3px solid #4488ff !important;
+    div[data-testid="stVerticalBlock"]:has(div.stButton > button[key*="generate_fixed"]) {
+        margin-top: 1rem;
     }
     
-    /* Attack section styling */
-    div[data-testid="stVerticalBlock"]:has(div.attack-section-marker) {
-        background-color: #1a0a0a !important;
-        border-left: 3px solid #8b5cf6 !important;
-        border-top: 1px solid #8b5cf620 !important;
-        border-right: 1px solid #8b5cf620 !important;
-        border-bottom: 1px solid #8b5cf620 !important;
-        border-radius: 6px !important;
-        padding: 12px !important;
-        margin-top: 8px !important;
-        gap: 8px !important;
+    /* Hover effect for about cards */
+    .about-card {
+        background-color: #1a1625;
+        border: 1px solid #2d2640;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        margin-bottom: 16px;
+        min-height: 220px;
     }
-    
-    /* Fix section styling */
-    div[data-testid="stVerticalBlock"]:has(div.fix-section-marker) {
-        background-color: #0a1a0a !important;
-        border-left: 3px solid #8b5cf6 !important;
-        border-top: 1px solid #8b5cf620 !important;
-        border-right: 1px solid #8b5cf620 !important;
-        border-bottom: 1px solid #8b5cf620 !important;
-        border-radius: 6px !important;
-        padding: 12px !important;
-        margin-top: 12px !important;
-        gap: 8px !important;
+    .about-card:hover {
+        transform: translateY(-4px);
+        border-color: #8b5cf6;
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+    }
+    .about-icon {
+        font-size: 2.2rem;
+        margin-bottom: 12px;
+    }
+    .about-title {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    .about-desc {
+        color: #8b949e;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    .badge-vuln {
+        display: inline-block;
+        background-color: #2d2640;
+        border: 1px solid #8b5cf6;
+        border-radius: 20px;
+        padding: 6px 14px;
+        color: #a78bfa;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin: 4px;
+    }
+    .badge-lang {
+        display: inline-block;
+        background-color: #1a1625;
+        border: 1px solid #2d2640;
+        border-radius: 20px;
+        padding: 6px 14px;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin: 4px;
+    }
+    .badge-tech {
+        display: inline-block;
+        background-color: #1a1625;
+        border: 1px solid #2d2640;
+        border-radius: 20px;
+        padding: 4px 12px;
+        color: #c9d1d9;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin: 4px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -617,8 +637,126 @@ with tab1:
             else:
                 st.success(f"Scan complete. Found {len(prioritized_vulns)} vulnerabilities.")
 
-    # Show metrics & details inside tab1 if they exist in session state
-    if st.session_state.get("vulns"):
+    # Show metrics & details inside tab1 depending on state
+    if not st.session_state.get("vulns"):
+        # Show about/landing content here
+        st.write("") # spacer
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+            <h2 style="font-size: 2.4rem !important; font-weight: 800 !important; color: #ffffff !important; margin-bottom: 0.5rem !important;">What is CodeShield?</h2>
+            <p style="font-size: 1.1rem !important; color: #a78bfa !important; max-width: 800px; margin: 0 auto;">An AI-powered multi-agent security code review system that finds vulnerabilities, simulates attacks, and fixes your code.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("### How It Works")
+        
+        # 2x2 grid using st.columns
+        row1_col1, row1_col2 = st.columns(2)
+        with row1_col1:
+            st.markdown("""
+            <div class="about-card">
+                <div class="about-icon">🔍</div>
+                <div class="about-title">Scan</div>
+                <div class="about-desc">Paste your code or link a GitHub repo. Our AI scanner detects security vulnerabilities instantly.</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with row1_col2:
+            st.markdown("""
+            <div class="about-card">
+                <div class="about-icon">⚔️</div>
+                <div class="about-title">Simulate</div>
+                <div class="about-desc">See exactly how an attacker would exploit each vulnerability with real-world breach examples.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        row2_col1, row2_col2 = st.columns(2)
+        with row2_col1:
+            st.markdown("""
+            <div class="about-card">
+                <div class="about-icon">✅</div>
+                <div class="about-title">Fix</div>
+                <div class="about-desc">Get specific before/after code fixes generated automatically for every vulnerability found.</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with row2_col2:
+            st.markdown("""
+            <div class="about-card">
+                <div class="about-icon">📥</div>
+                <div class="about-title">Download</div>
+                <div class="about-desc">Download a fully corrected version of your code with all vulnerabilities patched.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        st.write("") # Spacer
+        
+        st.markdown("### Vulnerabilities We Detect")
+        st.markdown("""
+        <div style="display: flex; flex-wrap: wrap; margin-bottom: 2rem;">
+            <span class="badge-vuln">SQL Injection</span>
+            <span class="badge-vuln">XSS</span>
+            <span class="badge-vuln">Command Injection</span>
+            <span class="badge-vuln">Hardcoded Secrets</span>
+            <span class="badge-vuln">Path Traversal</span>
+            <span class="badge-vuln">SSRF</span>
+            <span class="badge-vuln">Missing Validation</span>
+            <span class="badge-vuln">Insecure Functions</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("### Supported Languages")
+        st.markdown("""
+        <div style="display: flex; flex-wrap: wrap; margin-bottom: 2rem;">
+            <span class="badge-lang">Python</span>
+            <span class="badge-lang">JavaScript</span>
+            <span class="badge-lang">PHP</span>
+            <span class="badge-lang">Java</span>
+            <span class="badge-lang">TypeScript</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("### How to Use")
+        st.markdown("""
+        <div style="background-color: #13111c; border: 1px solid #2d2640; border-radius: 8px; padding: 20px; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                <div style="background-color: #8b5cf6; color: #ffffff; font-weight: 700; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px;">1</div>
+                <div style="color: #c9d1d9; font-size: 0.95rem;">Paste your source code in the <strong>Scan Code</strong> tab or paste a repo URL under <strong>Scan GitHub Repo</strong>.</div>
+            </div>
+            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                <div style="background-color: #8b5cf6; color: #ffffff; font-weight: 700; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px;">2</div>
+                <div style="color: #c9d1d9; font-size: 0.95rem;">Click <strong>Scan Code</strong> (or Fetch & scan a repository) and wait for the AI security review to analyze the patterns.</div>
+            </div>
+            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                <div style="background-color: #8b5cf6; color: #ffffff; font-weight: 700; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px;">3</div>
+                <div style="color: #c9d1d9; font-size: 0.95rem;">Expand any found vulnerability and click <strong>Reveal Attack</strong> to visualize exactly how it gets exploited.</div>
+            </div>
+            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                <div style="background-color: #8b5cf6; color: #ffffff; font-weight: 700; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px;">4</div>
+                <div style="color: #c9d1d9; font-size: 0.95rem;">Click <strong>Generate Fixed Version</strong> (or inspect individual <strong>The Fix</strong> sections) to obtain correct, secure drop-in code.</div>
+            </div>
+            <div style="display: flex; align-items: flex-start;">
+                <div style="background-color: #8b5cf6; color: #ffffff; font-weight: 700; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px;">5</div>
+                <div style="color: #c9d1d9; font-size: 0.95rem;">Download the fully secure, updated source file using the <strong>Download Fixed</strong> button.</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # Built With section at bottom
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.9rem; color: #8b949e; margin-bottom: 10px; font-weight: 600;">Built With</div>
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                <span class="badge-tech">LLaMA 3.3 70B</span>
+                <span class="badge-tech">Groq</span>
+                <span class="badge-tech">Python 3.11</span>
+                <span class="badge-tech">Streamlit</span>
+                <span class="badge-tech">SQLite</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">Built for Google x Kaggle AI Agents Intensive Vibe Coding Capstone 2026</div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
         st.divider()
         m_col1, m_col2, m_col3 = st.columns(3)
         
@@ -779,6 +917,8 @@ with tab2:
                     )
             else:
                 st.success("Scan complete. No vulnerabilities found in the selected files.")
+
+
 
 
 
